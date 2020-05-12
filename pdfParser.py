@@ -11,10 +11,13 @@ link= soup.find_all('a', href=True)
 fileUrl= url+ link[5].get("href")
 file = link[5].get("href").split(".")
 fileName = file[0]
-print("Downloading "+fileName)
 fileLoc = str(fileName+".pdf")
+print("Downloading as "+fileLoc)
 
 urllib.request.urlretrieve(fileUrl,fileLoc)
 
 csvName = fileName+".csv"
-tabula.convert_into(fileLoc, csvName, output_format="csv", pages='all')
+print("Converting to "+csvName)
+
+tabula.convert_into(fileLoc, csvName, output_format="csv", pages='all', silent=True)
+print("Done!")
