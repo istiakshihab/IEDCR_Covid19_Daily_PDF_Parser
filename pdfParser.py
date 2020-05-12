@@ -9,7 +9,8 @@ soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'),featur
 
 link= soup.find_all('a', href=True)
 fileUrl= url+ link[5].get("href")
-fileName = str(datetime.today().strftime('%Y_%m_%d'))
+file = link[5].get("href").split(".")
+fileName = file[0]
 fileLoc = str(fileName+".pdf")
 
 urllib.request.urlretrieve(fileUrl,fileLoc)
