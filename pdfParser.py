@@ -1,7 +1,8 @@
 from bs4 import BeautifulSoup
 import urllib.request
 from datetime import datetime
-import tabula
+import camelot
+import pandas as pd
 
 url = "https://www.iedcr.gov.bd/website/images/files/nCoV/"
 resp = urllib.request.urlopen(url+"?C=M;O=D")
@@ -19,8 +20,32 @@ for link in soup.find_all('a', href=True):
 
 urllib.request.urlretrieve(fileUrl,fileLoc)
 
-csvName = fileName+".csv"
-print("Converting to "+csvName)
+csvNameBD = fileName+"Whole"+".csv"
+csvNameDHK = fileName+"DHK"+".csv"
+print("Converting to "+csvNameBD)
 
-tabula.convert_into(fileLoc, csvName, output_format="csv", pages='all', silent=True)
+BDTables = camelot.read_pdf(fileLoc, pages = "1")
+bdlist= []
+for table in BDTables:
+    bdlist.append(table.df)
+bddf = pd.concat(bdlist)
+del bddf[0]
+del bddf[3]
+del bddf[4]
+bddf = bddf.iloc[1:]
+bddf = bddf.iloc[bddf[1].str.lower().argsort()]
+bddf.to_csv(csvNameBD, index=False)
+
+try:
+    DhakaTables = camelot.read_pdf(fileLoc, pages = "2")
+    print("Converting to "+csvNameDHK)
+    dhklist= []
+    for table in DhakaTables:
+        dhklist.append(table.df)
+    dhkdf = pd.concat(dhklist) 
+    dhkdf = dhkdf.iloc[dhkdf[0].str.lower().argsort()]
+    dhkdf.to_csv(csvNameDHK, index=False)
+except IndexError:
+    print("IEDCR didn't publish any data for DhakaCity today.")
+    
 print("Done!")
