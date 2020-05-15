@@ -1,7 +1,10 @@
 from bs4 import BeautifulSoup
 import urllib.request
 from datetime import datetime
-import camelot
+try:
+    import camelot
+except ImportError:
+    raise ImportError('Camelot not found. Try running "pip3 install camelot-py[cv]"')
 import pandas as pd
 
 url = "https://www.iedcr.gov.bd/website/images/files/nCoV/"
@@ -20,8 +23,8 @@ for link in soup.find_all('a', href=True):
 
 urllib.request.urlretrieve(fileUrl,fileLoc)
 
-csvNameBD = fileName+"Whole"+".csv"
-csvNameDHK = fileName+"DHK"+".csv"
+csvNameBD = fileName+"_Bangladesh"+".csv"
+csvNameDHK = fileName+"_DHK"+".csv"
 print("Converting to "+csvNameBD)
 
 BDTables = camelot.read_pdf(fileLoc, pages = "1")
@@ -47,5 +50,5 @@ try:
     dhkdf.to_csv(csvNameDHK, index=False)
 except IndexError:
     print("IEDCR didn't publish any data for DhakaCity today.")
-    
+
 print("Done!")
