@@ -47,6 +47,7 @@ try:
         dhklist.append(table.df)
     dhkdf = pd.concat(dhklist) 
     dhkdf = dhkdf.iloc[dhkdf[0].str.lower().argsort()]
+    dhkdf.drop(dhkdf.loc[dhkdf[0]=="Location"].index, inplace=True)
     dhkdf.to_csv(csvNameDHK, index=False)
 except IndexError:
     print("IEDCR didn't publish any data for DhakaCity today.")
