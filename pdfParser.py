@@ -45,7 +45,7 @@ else:
     bddf.to_csv(csvNameBD, index=False)
 
     try:
-        DhakaTables = camelot.read_pdf(fileLoc, pages = "2")
+        DhakaTables = camelot.read_pdf(fileLoc, pages = "2-end")
         print("Converting to "+csvNameDHK)
         dhklist= []
         for table in DhakaTables:
