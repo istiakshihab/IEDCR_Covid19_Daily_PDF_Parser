@@ -7,6 +7,7 @@ except ImportError:
     raise ImportError('Camelot not found. Try running "pip3 install camelot-py[cv]"')
 import pandas as pd
 from pathlib import Path
+import re
 
 url = "https://www.iedcr.gov.bd/website/images/files/nCoV/"
 resp = urllib.request.urlopen(url+"?C=M;O=D")
@@ -14,7 +15,7 @@ soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'),featur
 
 for link in soup.find_all('a', href=True):
     x= link.get("href").split("_")
-    if x[0]=="Case":
+    if x[0]=="Case" or re.match("^\d.*",x[0]):
         fileUrl= url+ link.get("href")
         file = link.get("href").split(".")
         fileName = file[0]
@@ -31,19 +32,20 @@ else:
     csvNameBD = fileName+"_Bangladesh"+".csv"
     csvNameDHK = fileName+"_DHK"+".csv"
     print("Converting to "+csvNameBD)
-
-    BDTables = camelot.read_pdf(fileLoc, pages = "1")
-    bdlist= []
-    for table in BDTables:
-        bdlist.append(table.df)
-    bddf = pd.concat(bdlist)
-    del bddf[0]
-    del bddf[3]
-    del bddf[4]
-    bddf = bddf.iloc[1:]
-    bddf = bddf.iloc[bddf[1].str.lower().argsort()]
-    bddf.to_csv(csvNameBD, index=False)
-
+    try: 
+        BDTables = camelot.read_pdf(fileLoc, pages = "1")
+        bdlist= []
+        for table in BDTables:
+            bdlist.append(table.df)
+        bddf = pd.concat(bdlist)
+        del bddf[0]
+        del bddf[3]
+        del bddf[4]
+        bddf = bddf.iloc[1:]
+        bddf = bddf.iloc[bddf[1].str.lower().argsort()]
+        bddf.to_csv(csvNameBD, index=False)
+    except Exception:
+        print(Exception)
     try:
         DhakaTables = camelot.read_pdf(fileLoc, pages = "2-end")
         print("Converting to "+csvNameDHK)
